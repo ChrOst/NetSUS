@@ -130,7 +130,9 @@ function getNetType()
 
 function getCurrentWebUser()
 {
-	return $_SESSION['username'];
+	if(isset($_SESSION['username'])) {
+		return $_SESSION['username'];
+	}
 }
 
 function setWebAdminUser($username, $password)
