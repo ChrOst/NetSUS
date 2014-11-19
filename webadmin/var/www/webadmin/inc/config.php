@@ -21,6 +21,7 @@ class WebadminConfig
 	private $topElement;
 	private $settings;
 	private $subnets;
+	private $ldap;
 	private $autosyncbranches;
 	private $defaultpasses;
 	private $files;
@@ -29,6 +30,7 @@ class WebadminConfig
 	{
 		$this->settings = array();
 		$this->subnets = array();
+		$this->ldap = array();
 		$this->autosyncbranches = array();
 		$this->defaultpasses = array();
 		$dom = new DOMDocument;
@@ -104,7 +106,7 @@ class WebadminConfig
 	{
 		foreach($this->topElement->childNodes as $curNode)
 		{
-			if ($curNode->nodeName == "netbootsubnets" || $curNode->nodeName == "autosyncbranches" || $curNode->nodeName == "defaultpasses" || $curNode->nodeName == "files")
+			if ($curNode->nodeName == "netbootsubnets" || $curNode->nodeName == "autosyncbranches" || $curNode->nodeName == "defaultpasses" || $curNode->nodeName == "files" || $curNode->nodeName == "ldap")
 			{
 				continue;
 			}
@@ -116,6 +118,7 @@ class WebadminConfig
 		}
 
 		$this->loadSubnets();
+		$this->loadLdap();
 	}
 
 	public function saveSettings()
@@ -175,13 +178,30 @@ class WebadminConfig
 		$defaultpasses = $this->createElement("defaultpasses");
 		$this->topElement->appendChild($defaultpasses);
 		
-		// Lopo through the default pass list
+		// Loop through the default pass list
 		foreach($this->defaultpasses as $key => $value)
 		{
 			$newDefaultPass = $this->createElement("defaultpass");
 			$newDefaultPass->nodeValue = $key;
 			$defaultpasses->appendChild($newDefaultPass);
 		}
+
+		/**
+		* LDAP Settings
+		*/
+		$ldap = $this->createElement("ldap");
+		$this->topElement->appendChild($ldap);
+		foreach($this->ldap["groups"] as $Group) {
+			$GroupNode = $this->createElement("group");
+			$GroupNode->nodeValue = $Group;
+			$ldap->appendChild($GroupNode);
+		}
+		$ldapdomain = $this->createElement("domain");
+		$ldapdomain->nodeValue = $this->ldap["domain"];
+		$ldap->appendChild($ldapdomain);
+		$ldapsearchdn = $this->createElement("searchdn");
+		$ldapsearchdn->nodeValue = $this->ldap["searchdn"];
+		$ldap->appendChild($ldapsearchdn);
 
 		// Write the newly-created XML document to the settings file
 		if ($this->xmlDoc->save(CONF_FILE_PATH) === FALSE)
@@ -216,6 +236,57 @@ class WebadminConfig
 		}
 	}
 
+	/**
+	* LDAP Functions. Add, Delete and Load LDAP Details
+	*/
+	private function loadLdap() {
+		$this->ldap["groups"] = array();
+		$ldap = $this->xmlDoc->getElementsByTagName("ldap");
+		foreach($ldap as $node) {
+			foreach($node->childNodes as $child) {
+				if($child->nodeName == "group") {
+					$this->ldap["groups"][] = $child->nodeValue;
+				}
+				elseif($child->nodeName == "domain") {
+					$this->ldap["domain"] = $child->nodeValue;
+				}
+				elseif($child->nodeName == "searchdn") {
+					$this->ldap["searchdn"] = $child->nodeValue;
+				}
+			}
+		}
+		/*$this->ldap["domain"] = $ldap->getElementsByTagName("domain")->nodeValue;
+		$this->ldap["searchdn"] = $ldap->getElementsByTagName("searchdn")->nodeValue;*/
+	}
+	
+	public function addLdapGroup($Group) {
+		$this->ldap["groups"][] = $Group;
+	}
+	
+	public function deleteLdapGroup($Group) {
+		foreach($this->ldap["groups"] as $Key => $CurrentGroup) {
+			if($CurrentGroup == $Group) {
+				unset($this->ldap["groups"][$Key]);
+			}
+		}
+	}
+	
+	/**
+	* Since set and get-Settings does not support arrays and so
+	*/
+	public function setLdapSetting($name, $setting) {
+		if(in_array($name, array("searchdn", "domain"))) {
+			$this->ldap[$name] = $setting;
+		}
+	}
+	
+	public function getLdapSetting($name) {
+		if(in_array($name, array("searchdn", "domain", "groups"))) {
+			return $this->ldap[$name];
+		}
+	}
+	
+	
 	public function getSubnets()
 	{
 		return $this->subnets;

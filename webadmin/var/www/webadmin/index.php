@@ -1,6 +1,7 @@
-<?php
+﻿<?php
 session_start();
 
+include "inc/auth.activedirectory.php";
 include "inc/config.php";
 include "inc/functions.php";
 
@@ -16,9 +17,19 @@ if ((isset($_POST['username'])) && (isset($_POST['password']))) {
 	$username=$_POST['username'];
 	$password=hash("sha256",$_POST['password']);
 
+	$_SESSION['username'] = $username;
+
 	if (($username != "") && ($password != "")) {
 		if ($username == $admin_username && $password == $admin_password) {
 			$isAuth=TRUE;
+		}
+		elseif(!$isAuth) {
+			$ldap = new auth_activedirectory($conf);
+			if($ldap) {
+				if($ldap->authenticate($_POST['username'], $_POST['password'])) {
+					$isAuth = $ldap->isAuthorized();
+				}
+			}
 		}
 	}
 }

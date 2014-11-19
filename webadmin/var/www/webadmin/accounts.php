@@ -18,7 +18,7 @@ $accountsuccess = "";
 if (isset($_POST['SaveWebAccount']) && isset($_POST['username']) && isset($_POST['password']) 
 	&& isset($_POST['confirm']) && isset($_POST['confirmold']))
 {
-	if (hash("sha256",$_POST['confirmold']) == $conf->getSetting("webadminpass"))
+	if ($conf->getSetting('webadminuser') != getCurrentWebUser() or hash("sha256",$_POST['confirmold']) == $conf->getSetting("webadminpass"))
 	{	
 		if ($_POST['password'] == "")
 		{
@@ -137,19 +137,18 @@ include "inc/header.php";
 			<form method="POST" name="WebAdmin" id="WebAdmin" >
 
 				<div id="WebAdmin_Pane" class="pane" <?php if (isset($hideWebAdmin)) { echo $hideWebAdmin; } ?>>
-
 					<input type="hidden" name="userAction" value="WebAdmin">
  
 					<span class="label">Current Username</span>
-					<input type="text" value="<?php echo getCurrentWebUser();?>" readonly class="disabled"/>
+					<input type="text" value="<?php echo $conf->getSetting('webadminuser');?>" readonly class="disabled"/>
 					<br>
-					
+					<?php if(getCurrentWebUser()===$conf->getSetting('webadminuser')) { /* If the logged in user is "webadmin", he has to know his password to change it. */ ?>
 					<span class="label">Current Password</span>
 					<input type="password" name="confirmold" id="confirmold" value="" />
 					<br>
-
+					<?php } ?>
 					<span class="label">New Username</span>
-					<input type="text" name="username" id="username" value="<?php echo getCurrentWebUser();?>" />
+					<input type="text" name="username" id="username" value="<?php echo $conf->getSetting('webadminuser');?>" />
 					<br>
 
 					<span class="label">New Password</span>

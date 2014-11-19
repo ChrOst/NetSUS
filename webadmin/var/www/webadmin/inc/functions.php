@@ -130,8 +130,7 @@ function getNetType()
 
 function getCurrentWebUser()
 {
-	global $admin_username;
-	return $admin_username;
+	return $_SESSION['username'];
 }
 
 function setWebAdminUser($username, $password)
