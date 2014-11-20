@@ -1,0 +1,13 @@
+#!/bin/bash
+# imgpath as from NetworkStatsInstall.sh
+imgpath="/var/www/webadmin/images/vnstat/"
+
+# loop interfaces and generate graphics for them
+for interface in $(ls /sys/class/net/)
+do
+	vnstati -h -ne -o ${imgpath}${interface}_h.png
+	vnstati -d -ne -o ${imgpath}${interface}_d.png
+	vnstati -m -ne -o ${imgpath}${interface}_m.png
+	vnstati -s -ne -o ${imgpath}${interface}_s.png
+done
+

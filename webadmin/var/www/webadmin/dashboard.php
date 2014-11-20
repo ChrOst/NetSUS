@@ -1,5 +1,9 @@
 <?php
-
+/**
+* NetworkInteraces may be something configureable in the future
+* atleast the interfaces could be useful in multiple places
+*/
+$NetworkInterfaces = array("eth0");
 include "inc/config.php";
 include "inc/auth.php";
 include "inc/functions.php";
@@ -134,7 +138,54 @@ if ($conf->needsToChangeAnyPasses())
 			</ul>
 
 		</div>
-		
-	</div>
 
-<?php include "inc/footer.php";?>
+	</div>
+	<div id="netboot-server">
+	<?php
+		/**
+		* just copied the netboot-server style for showing the interface stats
+		* this is kinda unclean so far since the style id "netboot-server" exists twice now
+		* we use vnstat + vnstati here. vnstati generates the graphics.
+		* be aware that this already works with multiple interfaces
+		*/
+		foreach ($NetworkInterfaces as $Interface ) {
+	?>
+
+		<h3>Network I/O - <?php echo $Interface; ?></h3>
+		<div class="container" id="network-io">
+			<ul>
+				<li>
+					<span><?php echo $Interface; ?>-hourly:</span>
+					<br />
+					<br />
+					<br />
+					<img src="/webadmin/images/vnstat/<?php echo $Interface; ?>_h.png" />
+				</li>
+				<li>
+					<span><?php echo $Interface; ?>-summary:</span>
+					<br />
+					<br />
+					<br />
+					<img src="/webadmin/images/vnstat/<?php echo $Interface; ?>_s.png" />
+				</li>
+				<li>
+					<span><?php echo $Interface; ?>-daily:</span>
+					<br />
+					<br />
+					<br />
+					<img src="/webadmin/images/vnstat/<?php echo $Interface; ?>_d.png" />
+				</li>
+				<li>
+					<span><?php echo $Interface; ?>-monthly:</span>
+					<br />
+					<br />
+					<br />
+					<img src="/webadmin/images/vnstat/<?php echo $Interface; ?>_m.png" />
+				</li>
+			</ul>
+		</div>
+	</div>
+<?php
+	}
+include "inc/footer.php";
+?>
