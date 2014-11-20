@@ -16,7 +16,7 @@ $accountsuccess = "";
 
 //Save the date/time settings if the SaveAccount
 if (isset($_POST['SaveWebAccount']) && isset($_POST['username']) && isset($_POST['password']) 
-	&& isset($_POST['confirm']) && isset($_POST['confirmold']))
+	&& isset($_POST['confirm']) )
 {
 	if ($conf->getSetting('webadminuser') != getCurrentWebUser() or hash("sha256",$_POST['confirmold']) == $conf->getSetting("webadminpass"))
 	{	
