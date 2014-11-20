@@ -16,7 +16,6 @@ $isAuth=FALSE;
 if ((isset($_POST['username'])) && (isset($_POST['password']))) {
 	$username=$_POST['username'];
 	$password=hash("sha256",$_POST['password']);
-
 	$_SESSION['username'] = $username;
 
 	if (($username != "") && ($password != "")) {
@@ -29,6 +28,7 @@ if ((isset($_POST['username'])) && (isset($_POST['password']))) {
 				if($ldap->authenticate($_POST['username'], $_POST['password'])) {
 					$isAuth = $ldap->isAuthorized();
 				}
+				$ldap->close();
 			}
 		}
 	}

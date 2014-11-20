@@ -172,6 +172,16 @@ class auth_activedirectory {
 		return $DNs;
 	}
 
+        /**
+        * Close
+        * Closes the LDAP Connection properly
+        *
+        * @return Boolean
+        * Returns true if the was closed, if not false
+        */
+        public function close() {
+                return ldap_close($this->Connection);
+        }
 
 }
 ?>
